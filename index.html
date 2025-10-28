@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>気温・湿度記録</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+      background: #f9f9f9;
+    }
+    label {
+      display: block;
+      margin: 0.5em 0;
+    }
+    input {
+      padding: 0.3em;
+      width: 5em;
+    }
+    button {
+      margin-top: 0.8em;
+      padding: 0.4em 0.8em;
+      font-size: 1em;
+    }
+    ul {
+      background: #fff;
+      padding: 1em;
+      border-radius: 0.5em;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h2>気温・湿度記録</h2>
+  <label>気温(℃)：<input id="temp" type="number"></label>
+  <label>湿度(%)：<input id="humid" type="number"></label>
+  <button onclick="save()">保存</button>
+  <button onclick="sendMail()">メール送信</button>
+
+  <h3>最近の記録</h3>
+  <ul id="list"></ul>
+
+  <script>
+    function save() {
+      const t = document.getElementById('temp').value;
+      const h = document.getElementById('humid').value;
+      const d = new Date().toLocaleString();
+      const record = {time: d, temp: t, humid: h};
+
+      let data = JSON.parse(localStorage.getItem('records') || '[]');
+      data.push(record);
+      localStorage.setItem('records', JSON.stringify(data));
+      display();
+    }
+
+    function display() {
+      const list = document.getElementById('list');
+      const data = JSON.parse(localStorage.getItem('records') || '[]');
+      list.innerHTML = data.map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%</li>`).join('');
+    }
+
+    function sendMail() {
+      const data = JSON.parse(localStorage.getItem('records') || '[]');
+      const body = encodeURIComponent(data.map(r => `${r.time} ${r.temp}℃ ${r.humid}%`).join('\n'));
+      location.href = `mailto:?subject=気温・湿度記録&body=${body}`;
+    }
+
+    display();
+  </script>
+</body>
+</html>
