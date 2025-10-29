@@ -8,25 +8,50 @@
       font-family: sans-serif;
       margin: 2em;
       background: #f9f9f9;
+      font-size: 20px; /* 👈 全体の文字を大きく */
+      text-align: center; /* 👈 全体を中央寄せ */
     }
     label {
       display: block;
-      margin: 0.5em 0;
+      margin: 0.5em auto;
+      width: 12em; /* 👈 入力欄の幅を制御 */
+      text-align: left;
     }
     input {
-      padding: 0.3em;
-      width: 5em;
+      padding: 0.4em;
+      width: 6em;
+      font-size: 18px; /* 👈 入力欄の文字も大きく */
     }
     button {
       margin-top: 0.8em;
-      padding: 0.4em 0.8em;
-      font-size: 1em;
+      padding: 0.5em 1em;
+      font-size: 18px; /* 👈 ボタンの文字を大きく */
+      border-radius: 0.5em;
+      border: 1px solid #ccc;
+      background: #fff;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f0f0f0;
+    }
+    h2, h3 {
+      margin-top: 1em;
+      color: #333;
     }
     ul {
       background: #fff;
       padding: 1em;
       border-radius: 0.5em;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      width: 400px; /* 👈 横幅を短くして見やすく */
+      margin: 1em auto; /* 👈 中央に配置 */
+      text-align: left;
+      font-size: 18px; /* 👈 リスト内の文字も大きく */
+    }
+    li {
+      border-bottom: 1px solid #ddd;
+      padding: 0.3em 0;
     }
   </style>
 </head>
@@ -38,7 +63,7 @@
   <button onclick="save()">保存</button>
   <button onclick="sendMail()">メール送信</button>
   <button onclick="clearData()">すべての記録を削除</button>
-  
+
   <h3>最近の記録</h3>
   <ul id="list"></ul>
 
@@ -69,14 +94,15 @@
     }
 
     function clearData() {
-    　　if (confirm("保存されているデータをすべて削除します。よろしいですか？")) {
-      　　　localStorage.clear();
-      　　　alert("データを削除しました。");
-    　　}
-　  }
+      if (confirm("保存されているデータをすべて削除します。よろしいですか？")) {
+        localStorage.clear();
+        alert("データを削除しました。");
+        display();
+      }
+    }
 
-    
     display();
   </script>
 </body>
 </html>
+
