@@ -34,6 +34,7 @@
   <h2>気温・湿度記録</h2>
   <label>気温(℃)：<input id="temp" type="number"></label>
   <label>湿度(%)：<input id="humid" type="number"></label>
+  <label>コメント：<input id="comt" type="text"></label>
   <button onclick="save()">保存</button>
   <button onclick="sendMail()">メール送信</button>
   <button onclick="clearData()">すべての記録を削除</button>
@@ -45,8 +46,9 @@
     function save() {
       const t = document.getElementById('temp').value;
       const h = document.getElementById('humid').value;
+      const c = document.getElementById('comt').value;
       const d = new Date().toLocaleString();
-      const record = {time: d, temp: t, humid: h};
+      const record = {time: d, temp: t, humid: h, comt: c};
 
       let data = JSON.parse(localStorage.getItem('records') || '[]');
       data.push(record);
@@ -57,12 +59,12 @@
     function display() {
       const list = document.getElementById('list');
       const data = JSON.parse(localStorage.getItem('records') || '[]');
-      list.innerHTML = data.map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%</li>`).join('');
+      list.innerHTML = data.map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`).join('');
     }
 
     function sendMail() {
       const data = JSON.parse(localStorage.getItem('records') || '[]');
-      const body = encodeURIComponent(data.map(r => `${r.time} ${r.temp}℃ ${r.humid}%`).join('\n'));
+      const body = encodeURIComponent(data.map(r => `${r.time} ${r.temp}℃  ${r.humid}% ${r.comt}`).join('\n'));
       location.href = `mailto:?subject=気温・湿度記録&body=${body}`;
     }
 
