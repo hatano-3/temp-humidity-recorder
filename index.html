@@ -86,6 +86,10 @@
     function display() {
       const list = document.getElementById('list');
       const data = JSON.parse(localStorage.getItem('records') || '[]');
+
+      // 🔽 新しい順に並べ替え（降順）
+      data.sort((a, b) => new Date(b.time) - new Date(a.time));
+
       list.innerHTML = data.map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`).join('');
     }
 
