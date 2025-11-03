@@ -87,10 +87,31 @@
       const list = document.getElementById('list');
       const data = JSON.parse(localStorage.getItem('records') || '[]');
 
-      // 🔽 新しい順に並べ替え（降順）
+      // 新しい順に並べ替え
       data.sort((a, b) => new Date(b.time) - new Date(a.time));
 
-      list.innerHTML = data.map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`).join('');
+      // 🔽 日付ごとにグループ化
+      const groups = {};
+      data.forEach(r => {
+        const date = new Date(r.time).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+        if (!groups[date]) groups[date] = [];
+        groups[date].push(r);
+      });
+
+      // 🔽 HTML組み立て
+      let html = '';
+      for (const date in groups) {
+        html += `<h4>${date}</h4><ul>`;
+        html += groups[date]
+          .map(r => {
+            const t = new Date(r.time).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+            return `<li>${t}　${r.temp}℃ / ${r.humid}%：${r.comt}</li>`;
+          })
+          .join('');
+        html += '</ul>';
+      }
+
+      list.innerHTML = html;
     }
 
     function sendMail() {
