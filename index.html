@@ -95,31 +95,21 @@
       const list = document.getElementById('list');
       const data = JSON.parse(localStorage.getItem('records') || '[]');
 
-      // 新しい順に並べ替え
-      data.sort((a, b) => new Date(b.time) - new Date(a.time));
+      // 表示用HTML（リスト形式）
+      const htmlList = data
+        .map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`)
+        .join('');
 
-      // 🔽 日付ごとにグループ化
-      const groups = {};
-      data.forEach(r => {
-        const date = new Date(r.time).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
-        if (!groups[date]) groups[date] = [];
-        groups[date].push(r);
-      });
+      // CSV形式のテキストを作成
+      let csvText = "日時,気温(℃),湿度(%),コメント\n";
+      csvText += data.map(r => `${r.time},${r.temp},${r.humid},${r.comt}`).join("\n");
 
-      // 🔽 HTML組み立て
-      let html = '';
-      for (const date in groups) {
-        html += `<h4>${date}</h4><ul>`;
-        html += groups[date]
-          .map(r => {
-            const t = new Date(r.time).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-            return `<li>${t}　${r.temp}℃ / ${r.humid}%：${r.comt}</li>`;
-          })
-          .join('');
-        html += '</ul>';
-      }
-
-      list.innerHTML = html;
+      // 両方表示
+      list.innerHTML = `
+        <ul>${htmlList}</ul>
+        <h4>↓ CSV形式のテキスト出力 ↓</h4>
+        <pre style="background:#eee; padding:1em; border-radius:0.5em;">${csvText}</pre>
+      `;
     }
 
     function sendMail() {
