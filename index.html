@@ -3,76 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <title>気温・湿度記録</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 2em;
       background: #f9f9f9;
-      font-size: 20px; /* 👈 全体の文字を大きく */
-      text-align: center; /* 👈 全体を中央寄せ */
+      font-size: 1.1em;
     }
     label {
       display: block;
-      margin: 0.5em auto;
-      width: 12em; /* 👈 入力欄の幅を制御 */
-      text-align: left;
+      margin: 0.5em 0;
     }
     input {
-      padding: 0.4em;
+      padding: 0.3em;
       width: 6em;
-      font-size: 18px; /* 👈 入力欄の文字も大きく */
     }
     button {
       margin-top: 0.8em;
       padding: 0.5em 1em;
-      font-size: 18px; /* 👈 ボタンの文字を大きく */
+      font-size: 1em;
+      border: none;
       border-radius: 0.5em;
-      border: 1px solid #ccc;
-      background: #fff;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.1);
-      cursor: pointer;
+      background: #4CAF50;
+      color: white;
     }
     button:hover {
-      background: #f0f0f0;
-    }
-    h2, h3 {
-      margin-top: 1em;
-      color: #333;
-    }
-    h4 {
-      margin-top: 1em;
-      color: #333;
-      border-bottom: 1px solid #ccc;
+      background: #45a049;
     }
     ul {
       background: #fff;
       padding: 1em;
       border-radius: 0.5em;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      width: 400px; /* 👈 横幅を短くして見やすく */
-      margin: 1em auto; /* 👈 中央に配置 */
-      text-align: left;
-      font-size: 18px; /* 👈 リスト内の文字も大きく */
-      list-style: none;
-      padding-left: 1em;
-    }
-    li {
-      border-bottom: 1px solid #ddd;
-      padding: 0.3em 0;
-      margin: 0.2em 0;
     }
   </style>
 </head>
 <body>
   <h2>気温・湿度記録</h2>
+
   <label>気温(℃)：<input id="temp" type="number"></label>
   <label>湿度(%)：<input id="humid" type="number"></label>
   <label>コメント：<input id="comt" type="text"></label>
+
   <button onclick="save()">保存</button>
   <button onclick="sendMail()">メール送信</button>
-  <button onclick="clearData()">すべての記録を削除</button>
+  <button onclick="downloadCSV()">CSVダウンロード</button>
+  <button onclick="clearData()">すべて削除</button>
 
   <h3>最近の記録</h3>
   <ul id="list"></ul>
@@ -94,28 +71,38 @@
     function display() {
       const list = document.getElementById('list');
       const data = JSON.parse(localStorage.getItem('records') || '[]');
-
-      // 表示用HTML（リスト形式）
-      const htmlList = data
-        .map(r => `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`)
-        .join('');
-
-      // CSV形式のテキストを作成
-      let csvText = "日時,気温(℃),湿度(%),コメント\n";
-      csvText += data.map(r => `${r.time},${r.temp},${r.humid},${r.comt}`).join("\n");
-
-      // 両方表示
-      list.innerHTML = `
-        <ul>${htmlList}</ul>
-        <h4>↓ CSV形式のテキスト出力 ↓</h4>
-        <pre style="background:#eee; padding:1em; border-radius:0.5em;">${csvText}</pre>
-      `;
+      list.innerHTML = data.map(r =>
+        `<li>${r.time}：${r.temp}℃ / ${r.humid}%：${r.comt}</li>`
+      ).join('');
     }
 
     function sendMail() {
       const data = JSON.parse(localStorage.getItem('records') || '[]');
-      const body = encodeURIComponent(data.map(r => `${r.time} ${r.temp}℃  ${r.humid}% ${r.comt}`).join('\n'));
+      const body = encodeURIComponent(
+        data.map(r => `${r.time} ${r.temp}℃ ${r.humid}% ${r.comt}`).join('\n')
+      );
       location.href = `mailto:?subject=気温・湿度記録&body=${body}`;
+    }
+
+    function downloadCSV() {
+      const data = JSON.parse(localStorage.getItem('records') || '[]');
+      if (data.length === 0) {
+        alert("保存されているデータがありません。");
+        return;
+      }
+
+      let csv = "日時,気温(℃),湿度(%),コメント\n";
+      csv += data.map(r =>
+        `${r.time},${r.temp},${r.humid},${r.comt}`
+      ).join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "records.csv";
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
     function clearData() {
